@@ -3,39 +3,45 @@ import pytz
 CLAUDE_MODEL = "claude-sonnet-4-20250514"
 CST = pytz.timezone("America/Chicago")
 
-# RSS feed URLs.
-# Verify each URL is reachable before the first production run — news sites
-# occasionally change feed paths. Run:  python3 -c "from fetcher import fetch_all_articles; fetch_all_articles()"
+# RSS feed URLs — confirmed via search May 2026.
+# If a feed stops working, check the source site's /rss or /feed page.
 RSS_FEEDS = [
     {
         "name": "Dallas Morning News",
-        # Arc CMS outbound feed; alternate: https://rss.dallasnews.com/
-        "url": "https://www.dallasnews.com/arc/outboundfeeds/rss/?outputType=xml",
+        # User-confirmed domain; if this 404s try:
+        # https://www.dallasnews.com/arc/outboundfeeds/rss/?outputType=xml
+        "url": "https://rss.dallasnews.com/",
     },
     {
         "name": "Dallas Business Journal",
-        "url": "https://www.bizjournals.com/dallas/rss/news",
+        # Confirmed: feeds.bizjournals.com subdomain for Dallas edition
+        "url": "https://feeds.bizjournals.com/bizj_dallas",
     },
     {
         "name": "Fort Worth Star-Telegram",
-        # McClatchy Arc feed
-        "url": "https://www.star-telegram.com/arc/outboundfeeds/rss/?outputType=xml",
+        # WordPress-style feed; if 404s try /news/local/rss2.0.xml
+        "url": "https://www.star-telegram.com/feed/",
     },
     {
         "name": "Dallas Observer",
-        "url": "https://www.dallasobserver.com/rss.xml",
+        # Confirmed: note capital R in Rss
+        "url": "https://www.dallasobserver.com/dallas/Rss.xml",
     },
     {
         "name": "WFAA",
-        "url": "https://www.wfaa.com/feeds/syndication/rss/news",
+        # Confirmed from wfaa.com/rss — local news feed
+        "url": "https://www.wfaa.com/feeds/syndication/rss/news/local",
     },
     {
         "name": "NBC DFW",
-        "url": "https://www.nbcdfw.com/feed/",
+        # Confirmed from nbcdfw.com/rss page
+        "url": "https://www.nbcdfw.com/news/feed/",
     },
     {
         "name": "Bisnow Dallas",
-        "url": "https://www.bisnow.com/dallas/feed",
+        # Bisnow does not publish a confirmed public RSS feed.
+        # Remove this entry if it consistently 404s or 403s.
+        "url": "https://www.bisnow.com/dallas-ft-worth/feed",
     },
 ]
 
