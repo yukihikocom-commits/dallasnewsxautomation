@@ -3,20 +3,23 @@ import pytz
 CLAUDE_MODEL = "claude-sonnet-4-20250514"
 CST = pytz.timezone("America/Chicago")
 
-# RSS feed URLs — verify each one is live before deploying.
-# Many news sites rotate or deprecate feed paths; update as needed.
+# RSS feed URLs.
+# Verify each URL is reachable before the first production run — news sites
+# occasionally change feed paths. Run:  python3 -c "from fetcher import fetch_all_articles; fetch_all_articles()"
 RSS_FEEDS = [
     {
         "name": "Dallas Morning News",
-        "url": "https://rss.dallasnews.com/",
+        # Arc CMS outbound feed; alternate: https://rss.dallasnews.com/
+        "url": "https://www.dallasnews.com/arc/outboundfeeds/rss/?outputType=xml",
     },
     {
         "name": "Dallas Business Journal",
-        "url": "https://www.bizjournals.com/dallas/news/rss.xml",
+        "url": "https://www.bizjournals.com/dallas/rss/news",
     },
     {
         "name": "Fort Worth Star-Telegram",
-        "url": "https://www.star-telegram.com/news/rss2.0.xml",
+        # McClatchy Arc feed
+        "url": "https://www.star-telegram.com/arc/outboundfeeds/rss/?outputType=xml",
     },
     {
         "name": "Dallas Observer",
