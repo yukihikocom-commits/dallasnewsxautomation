@@ -68,12 +68,11 @@ RELEVANT_TOPICS = [
     "demographics",
 ]
 
-# How many posts to select and publish per day
+# How many posts to select per day
 POSTS_PER_DAY = 5
 
-# Posting window in CST (24-hour)
-POSTING_START_HOUR = 7   # 7:00 AM CST
-POSTING_END_HOUR = 11    # 11:00 AM CST (last post at or before this)
+# Output directory for daily post files
+OUTPUT_DIR = "output"
 
 # Max articles to fetch per feed per run
 MAX_ARTICLES_PER_FEED = 30
