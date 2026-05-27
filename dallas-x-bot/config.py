@@ -1,6 +1,6 @@
 import pytz
 
-CLAUDE_MODEL = "claude-sonnet-4-20250514"
+CLAUDE_MODEL = "claude-haiku-4-5-20251001"
 CST = pytz.timezone("America/Chicago")
 
 # RSS feed URLs — confirmed via search May 2026.
