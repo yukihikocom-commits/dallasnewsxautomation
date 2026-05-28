@@ -10,6 +10,7 @@ Output: output/YYYY-MM-DD_posts.txt
 
 import logging
 import os
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -60,6 +61,16 @@ def save_posts_to_file(posts: list[dict], date_str: str) -> str:
             f.write(f"\n出典: [{post['article']['source']}] {post['article']['title']}\n")
             f.write("-" * 60 + "\n\n")
     return out_path
+
+
+def reveal_in_finder(path: str) -> None:
+    """On macOS, reveal the file in Finder. No-op on other platforms."""
+    if sys.platform != "darwin":
+        return
+    try:
+        subprocess.run(["open", "-R", os.path.abspath(path)], check=False)
+    except Exception as e:
+        logging.getLogger(__name__).warning("Could not reveal in Finder: %s", e)
 
 
 # ---------------------------------------------------------------------------
@@ -117,6 +128,7 @@ def run() -> int:
     logger.info("--- STEP 5: Saving to output file ---")
     out_path = save_posts_to_file(top_posts, today)
     logger.info("Saved %d posts to %s", len(top_posts), out_path)
+    reveal_in_finder(out_path)
 
     for i, p in enumerate(top_posts, 1):
         logger.info("  %d. [%s] %s", i, p["article"]["source"], p["text"][:100])

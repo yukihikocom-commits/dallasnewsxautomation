@@ -12,7 +12,7 @@ load_dotenv()
 from datetime import datetime
 from config import CST, POSTS_PER_DAY
 from claude_client import generate_posts, select_top_posts
-from main import setup_logging, save_posts_to_file
+from main import setup_logging, save_posts_to_file, reveal_in_finder
 from fetcher import save_posted_url
 
 import logging
@@ -111,6 +111,7 @@ top_posts = select_top_posts(posts, n=POSTS_PER_DAY)
 logger.info("--- Saving to output file ---")
 out_path = save_posts_to_file(top_posts, today)
 logger.info("Saved %d posts to %s", len(top_posts), out_path)
+reveal_in_finder(out_path)
 
 for i, p in enumerate(top_posts, 1):
     logger.info("  %d. [%s] %s", i, p["article"]["source"], p["text"][:100])
