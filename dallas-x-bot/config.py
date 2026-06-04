@@ -1,47 +1,48 @@
+import urllib.parse
+
 import pytz
 
 CLAUDE_MODEL = "claude-sonnet-4-6"
 CST = pytz.timezone("America/Chicago")
 
-# RSS feed URLs — confirmed via search May 2026.
-# If a feed stops working, check the source site's /rss or /feed page.
+
+# ---------------------------------------------------------------------------
+# News source: Google News RSS search
+# ---------------------------------------------------------------------------
+# Direct local-news RSS feeds (dallasnews.com, wfaa.com, nbcdfw.com, etc.)
+# block automated requests with HTTP 403 / dead DNS, so we pull from Google
+# News RSS instead. Google News aggregates those same outlets, returns clean
+# RSS 2.0, includes a per-article <source> publisher, and rarely bot-blocks.
+#
+# The `when:Nd` operator limits results to the last N days, so every run
+# returns *fresh* articles for that day rather than a static list.
+
+def _gnews_url(query: str) -> str:
+    """Build a Google News RSS search URL for the given query."""
+    params = urllib.parse.urlencode(
+        {"q": query, "hl": "en-US", "gl": "US", "ceid": "US:en"}
+    )
+    return f"https://news.google.com/rss/search?{params}"
+
+
+# Each "feed" is a targeted Google News query. Multiple queries widen topic
+# coverage; the fetcher deduplicates by URL and Claude filters for relevance.
 RSS_FEEDS = [
     {
-        "name": "Dallas Morning News",
-        # User-confirmed domain; if this 404s try:
-        # https://www.dallasnews.com/arc/outboundfeeds/rss/?outputType=xml
-        "url": "https://rss.dallasnews.com/",
+        "name": "Google News: DFW general",
+        "url": _gnews_url('("Dallas" OR "Fort Worth" OR "DFW" OR "North Texas") when:2d'),
     },
     {
-        "name": "Dallas Business Journal",
-        # Confirmed: feeds.bizjournals.com subdomain for Dallas edition
-        "url": "https://feeds.bizjournals.com/bizj_dallas",
+        "name": "Google News: DFW economy & business",
+        "url": _gnews_url('("Dallas" OR "Fort Worth" OR "DFW") (economy OR business OR jobs OR headquarters OR relocation) when:2d'),
     },
     {
-        "name": "Fort Worth Star-Telegram",
-        # WordPress-style feed; if 404s try /news/local/rss2.0.xml
-        "url": "https://www.star-telegram.com/feed/",
+        "name": "Google News: DFW real estate",
+        "url": _gnews_url('("Dallas" OR "Fort Worth" OR "DFW") ("real estate" OR housing OR "office market") when:2d'),
     },
     {
-        "name": "Dallas Observer",
-        # Confirmed: note capital R in Rss
-        "url": "https://www.dallasobserver.com/dallas/Rss.xml",
-    },
-    {
-        "name": "WFAA",
-        # Confirmed from wfaa.com/rss — local news feed
-        "url": "https://www.wfaa.com/feeds/syndication/rss/news/local",
-    },
-    {
-        "name": "NBC DFW",
-        # Confirmed from nbcdfw.com/rss page
-        "url": "https://www.nbcdfw.com/news/feed/",
-    },
-    {
-        "name": "Bisnow Dallas",
-        # Bisnow does not publish a confirmed public RSS feed.
-        # Remove this entry if it consistently 404s or 403s.
-        "url": "https://www.bisnow.com/dallas-ft-worth/feed",
+        "name": "Google News: DFW weather & transit",
+        "url": _gnews_url('("Dallas" OR "Fort Worth" OR "DFW") (weather OR storm OR airport OR DART OR transportation OR infrastructure) when:2d'),
     },
 ]
 
@@ -83,8 +84,9 @@ OUTPUT_DIR = "output"
 # Max articles to fetch per feed per run
 MAX_ARTICLES_PER_FEED = 30
 
-# Max age of articles to consider (hours)
-MAX_ARTICLE_AGE_HOURS = 24
+# Max age of articles to consider (hours) — aligned with the `when:2d`
+# freshness operator in the Google News queries above.
+MAX_ARTICLE_AGE_HOURS = 48
 
 # Batch size when sending articles to Claude for filtering
 FILTER_BATCH_SIZE = 25

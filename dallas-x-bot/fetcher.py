@@ -121,6 +121,17 @@ def _parse_rss(root: ElementTree.Element, source_name: str) -> list[dict]:
         if not title or not url:
             continue
 
+        # Google News RSS gives a per-article <source> publisher and tacks
+        # " - Publisher" onto the title; prefer the publisher name and strip
+        # the redundant suffix. Falls back to the feed name for plain feeds.
+        source = source_name
+        source_el = item.find("source")
+        if source_el is not None and (source_el.text or "").strip():
+            source = source_el.text.strip()
+            suffix = f" - {source}"
+            if title.endswith(suffix):
+                title = title[: -len(suffix)].strip()
+
         summary = (
             _text(item.find("{%s}encoded" % _NS["content"]))
             or _text(item.find("description"))
@@ -134,7 +145,7 @@ def _parse_rss(root: ElementTree.Element, source_name: str) -> list[dict]:
             "title": title,
             "summary": summary,
             "url": url,
-            "source": source_name,
+            "source": source,
             "pub_date": pub_date,
         })
     return articles

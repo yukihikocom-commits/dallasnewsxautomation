@@ -58,9 +58,10 @@ if [ ! -f .env ]; then
     fi
 fi
 
-# 4. Run the bot
-echo "==> 本日のニュース投稿を生成中..."
-python3 run_today.py
+# 4. Run the bot — main.py fetches fresh news live from Google News RSS,
+#    so every run pulls that day's articles.
+echo "==> 本日のニュース投稿を生成中（最新ニュースを取得）..."
+python3 main.py
 
 echo ""
 echo "==> 完了。Finderで output/ フォルダが開きます。"
